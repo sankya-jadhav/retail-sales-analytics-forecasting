@@ -1,156 +1,252 @@
 # Retail Sales Analytics and Demand Forecasting
 
-An end-to-end data analytics project that transforms retail sales data into business insights and forecasts future monthly demand using Python, SQL, MySQL, Power BI, and machine learning.
+An end-to-end data analytics project that transforms retail sales
+transactions into business insights and compares forecasting approaches
+for monthly units sold using Python, SQL, MySQL, Power BI, and machine
+learning.
 
-## Project Overview
+> **Important context:** The source dataset covers order dates from
+> January 2010 through September 2017. The monthly forecasting series
+> ends in July 2017. Forecasts for August 2017--July 2018 are a
+> historical forecasting exercise, not a current prediction.
 
-Retail businesses need to understand sales performance, profitability, regional contribution, and changes in demand to make better business decisions.
+## Project Objectives
 
-This project analyzes 50,000 sales records, builds a relational database for analytical queries, develops an interactive Power BI dashboard, and evaluates forecasting models to predict monthly units sold.
+-   Analyze revenue, cost, profit, units sold, products, regions,
+    countries, and sales channels.
+-   Design a relational MySQL database using a star schema.
+-   Prepare and load data through a Python ETL workflow.
+-   Build an interactive Power BI report.
+-   Compare baseline, statistical, and machine-learning forecasting
+    approaches using time-aware evaluation.
+-   Document assumptions and limitations.
 
-**Project objectives:**
-- Analyze revenue, cost, profit, and sales performance.
-- Identify high-performing products, regions, and countries.
-- Build a structured MySQL database using a star schema.
-- Automate data preparation and loading with Python.
-- Visualize business KPIs using Power BI.
-- Compare forecasting models using chronological validation.
+## Technology Stack
 
-## Tech Stack
-
-| Area | Technologies |
-|---|---|
-| Programming | Python |
-| Data Analysis | Pandas, NumPy |
-| Database | MySQL |
-| Querying | SQL |
-| Visualization | Matplotlib, Seaborn, Power BI |
-| Forecasting | Seasonal Naive, SARIMA, XGBoost |
-| Evaluation | MAE, RMSE, MAPE |
-| Development | Jupyter Notebook, VS Code |
-| Version Control | Git, GitHub |
-
-## Project Workflow
-
-1. **Data preparation:** Inspect the source dataset, validate data quality, clean inconsistent text, and prepare date columns.
-2. **Database design:** Organize sales data into a star schema with a fact table and supporting dimension tables.
-3. **ETL pipeline:** Use Python and Pandas to prepare data and load it into MySQL.
-4. **SQL analysis:** Analyze sales performance, profitability, product categories, sales channels, and geographic contribution.
-5. **Power BI dashboard:** Present business KPIs and interactive sales analysis.
-6. **Demand forecasting:** Aggregate monthly units sold, compare forecasting approaches, validate performance chronologically, and generate a 12-month forecast.
+  Area                   Tools
+  ---------------------- ----------------------------------------
+  Programming and ETL    Python, Pandas, NumPy
+  Database and queries   MySQL, SQL
+  Visualization          Power BI, Matplotlib, Seaborn
+  Forecasting            Seasonal Naive, SARIMA, XGBoost
+  Evaluation             MAE, RMSE, MAPE
+  Development            Jupyter Notebook, VS Code, Git, GitHub
 
 ## Dataset
 
-The project uses a sales records dataset containing 50,000 orders.
+The project uses 50,000 order-level sales records with fields such as
+Region, Country, Item Type, Sales Channel, Order Priority, Order Date,
+Ship Date, Units Sold, Unit Price, Unit Cost, Total Revenue, Total Cost,
+and Total Profit.
 
-**Key columns include:**
-- Region and Country
-- Item Type and Sales Channel
-- Order Date and Ship Date
-- Units Sold
-- Unit Price and Unit Cost
-- Total Revenue, Total Cost, and Total Profit
+The dataset has no customer, inventory, or stockout information. Monthly
+units sold is therefore used as a **proxy for demand**, not as a measure
+of unmet demand. The source is a sample dataset and may not represent
+the behavior of a real retailer; consider its licensing before
+redistribution.
 
-The dataset contains order-level sales records. Since customer, inventory, and stockout information is unavailable, monthly units sold is used as a proxy for demand rather than a measure of unmet demand.
+## Project Workflow
 
-The source dataset and its redistribution terms should be acknowledged and checked before public redistribution.
+1.  Inspect and prepare data; validate columns and dates, clean
+    inconsistent text, and prepare the analytical dataset.
+2.  Create a MySQL star-schema database.
+3.  Load dimensions and fact records through the Python ETL workflow.
+4.  Run SQL analyses for KPIs, regional and product results, sales
+    channels, and top countries.
+5.  Explore results in the Power BI report.
+6.  Compare forecasting models using chronological and walk-forward
+    validation.
 
 ## Database Design
 
-The MySQL database is named `retail_sales_analytics`.
+The database is named `retail_sales_analytics`.
 
-The star schema contains:
+-   `fact_sales` --- order-level measures and foreign keys.
+-   `dim_date` --- calendar attributes for order and ship dates.
+-   `dim_product` --- product categories.
+-   `dim_geography` --- countries and regions.
+-   `dim_sales_channel` --- sales channels.
+-   `dim_priority` --- priority codes.
+-   `monthly_forecast` --- stored monthly forecast values.
 
-- `fact_sales` — sales transactions and numerical measures.
-- `dim_date` — calendar attributes for order and ship dates.
-- `dim_product` — product categories.
-- `dim_geography` — countries and regions.
-- `dim_sales_channel` — online and offline channels.
-- `dim_priority` — order priority codes.
-- `monthly_forecast` — generated monthly forecast values.
+The date dimension is reused for order date and ship date (a
+role-playing dimension).
 
-This structure supports analytical queries while keeping descriptive attributes separate from transaction measures.
+## How to Run the Project
+
+### 1. Clone the repository
+
+``` bash
+git clone https://github.com/sankya-jadhav/retail-sales-analytics-forecasting.git
+cd retail-sales-analytics-forecasting
+```
+
+### 2. Create a Python environment and install dependencies
+
+``` powershell
+python -m venv .venv
+.\.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+```
+
+### 3. Configure database credentials
+
+Copy `.env.example` to `.env` and update it for your local MySQL setup:
+
+``` env
+DB_HOST=localhost
+DB_USER=your_mysql_username
+DB_PASSWORD=your_mysql_password
+DB_NAME=retail_sales_analytics
+```
+
+Do not commit `.env` or real credentials to GitHub.
+
+### 4. Create the database schema
+
+Open `sql/01_create_schema.sql` in MySQL Workbench and run it in a new
+or intentionally reset database environment. Review the script first: it
+creates the database and tables, but does not by itself populate the
+dimension and fact records. Do not rerun schema-creation statements
+against important existing data without reviewing them and making a
+backup.
+
+### 5. Load data
+
+Review `src/data/load_to_mysql.py` and ensure the dimension tables are
+populated as required by the ETL workflow before loading fact records.
+Configure `.env`, then run from the repository root:
+
+``` powershell
+python src/data/load_to_mysql.py
+```
+
+### 6. Run SQL analysis
+
+After the database is populated, open and execute
+`sql/02_business_analysis.sql` in MySQL Workbench.
+
+### 7. Explore the notebook and dashboard
+
+-   Open `notebook/sales.ipynb` in Jupyter Notebook or VS Code.
+-   Open `dashboard/dashboard.pbix` in Power BI Desktop. Refreshing may
+    require a MySQL connection configured on your machine.
+-   Forecast outputs are in `data/monthly_forecast.csv` and
+    `data/historical_forecast_combined.csv`.
 
 ## Key Business Findings
 
-The analysis produced the following findings:
+  Metric                               Result
+  --------------- ---------------------------
+  Orders                               50,000
+  Total revenue                 66.19 billion
+  Total cost                    46.66 billion
+  Total profit                  19.53 billion
+  Profit margin                        29.50%
+  Units sold        Approximately 250 million
 
-- **Total revenue:** 66.19 billion
-- **Total profit:** 19.53 billion
-- **Profit margin:** 29.50%
-- **Units sold:** Approximately 250 million
-- **Orders analyzed:** 50,000
+Other findings:
 
-Additional insights:
+-   Sub-Saharan Africa and Europe together contributed approximately
+    51.7% of total revenue.
+-   Household had the highest revenue among product categories.
+-   Cosmetics generated the highest absolute profit among product
+    categories.
+-   Clothes had the highest product profit margin, while Meat had the
+    lowest.
+-   Online and Offline sales had very similar revenue, profit, and order
+    volumes.
 
-- Sub-Saharan Africa and Europe together contributed approximately 51.7% of total revenue.
-- Household was the highest-revenue product category.
-- Cosmetics generated the highest absolute profit among the product categories.
-- Clothes had the highest profit margin, while Meat had the lowest.
-- Online and offline sales channels showed very similar revenue, profit, and order volumes.
-
-These findings describe the historical dataset and should not automatically be interpreted as current market conditions.
-
-## Demand Forecasting
-
-Monthly units sold were aggregated into a time series covering January 2010 through July 2017.
-
-**Forecasting approach:**
-1. Aggregate transactions into monthly units sold.
-2. Split data chronologically to avoid training on future observations.
-3. Evaluate Naive and Seasonal Naive baselines.
-4. Compare SARIMA and XGBoost models.
-5. Use walk-forward validation to compare performance across multiple historical periods.
-6. Select the model based on validation results and generate a 12-month forecast.
-
-### Model Comparison
-
-Walk-forward validation covered six-month evaluation periods in 2015, 2016, and 2017.
-
-| Model | Average MAE | Average RMSE | Average MAPE |
-|---|---:|---:|---:|
-| Seasonal Naive | 169,320 | 210,440 | 6.22% |
-| XGBoost | 174,745 | 207,283 | 6.43% |
-
-The **Seasonal Naive model** was selected as the final forecasting model because it achieved lower average MAE and MAPE across the validation periods. XGBoost achieved a slightly lower average RMSE, making it a useful machine-learning benchmark.
-
-The final forecast covers August 2017 through July 2018, the 12 months following the last observed month.
-
-**Important limitation:** The forecast is an experimental projection based on historical data, not a guarantee of future sales. The dataset ends in 2017, so the projected values should not be treated as a current business forecast.
+These figures describe the supplied historical dataset, not current
+retail-market results.
 
 ## Power BI Dashboard
 
-The Power BI report organizes the analysis into three pages:
-
-1. **Executive Overview:** Revenue, profit, profit margin, units sold, order count, and regional performance.
-2. **Sales Analysis:** Product-level revenue and profitability, profit margins, and top countries by revenue.
-3. **Demand Forecasting:** Historical monthly units sold, forecast values, and model validation metrics.
-
-The dashboard uses the MySQL tables as its data source and includes interactive filtering for relevant sales dimensions.
+The report has three pages: Executive Overview, Sales Analysis, and
+Demand Forecasting.
 
 ### Executive Overview
+
+Displays revenue, profit, margin, units sold, orders, yearly
+performance, regional contribution, and sales-channel comparison.
+
 ![Executive Overview](screenshots/executive_overview.png)
 
 ### Sales Analysis
+
+Explores revenue and profit by product, product profit margins, and top
+countries by revenue.
+
 ![Sales Analysis](screenshots/sales_analysis.png)
 
 ### Demand Forecasting
+
+Compares historical monthly units sold with the forecast and presents
+validation metrics.
+
 ![Demand Forecasting](screenshots/demand_forecasting.png)
 
-## Project Structure
+The editable Power BI report is included at `dashboard/dashboard.pbix`.
 
-```text
+## Forecasting Approach and Evaluation
+
+The forecasting target is monthly units sold. The series used for the
+experiment covers January 2010 through July 2017.
+
+-   **Initial split:** training from January 2010 to December 2016 (84
+    months); test from January to July 2017 (7 months).
+-   **Models compared:** Naive, Seasonal Naive, SARIMA, and XGBoost.
+-   **Additional evaluation:** walk-forward validation across six-month
+    periods in 2015, 2016, and 2017.
+
+### Walk-forward validation results
+
+  Model              Average MAE   Average RMSE   Average MAPE
+  ---------------- ------------- -------------- --------------
+  Seasonal Naive         169,320        210,440          6.22%
+  XGBoost                174,745        207,283          6.43%
+
+Seasonal Naive was selected because it achieved lower average MAE and
+MAPE across the reported walk-forward periods. XGBoost achieved a
+slightly lower average RMSE. Seasonal Naive therefore provided a strong,
+simple baseline for this dataset.
+
+The 12-month output covers **August 2017 through July 2018**. These are
+historical projections following the last observed month, not a forecast
+for current retail demand.
+
+### Forecasting limitations
+
+-   The dataset is a sample and may not represent a real retailer.
+-   Available history ends in 2017; the forecast should not be used for
+    present-day operational planning.
+-   The initial holdout test contains only seven months.
+-   Units sold is a demand proxy because inventory and stockout data are
+    unavailable.
+-   Forecasts are point estimates and do not provide prediction
+    intervals or guarantee future results.
+
+## Repository Structure
+
+``` text
 retail-sales-analytics-forecasting/
+├── dashboard/
+│   └── dashboard.pbix
 ├── data/
-│   └── 50000 Sales Records.csv
+│   ├── 50000 Sales Records.csv
+│   ├── historical_forecast_combined.csv
+│   └── monthly_forecast.csv
 ├── figure/
 │   └── image.png
 ├── notebook/
-│   ├── sales.ipynb
-│   ├── monthly_forecast.csv
-│   └── historical_forecast_combined.csv
+│   └── sales.ipynb
+├── screenshots/
+│   ├── demand_forecasting.png
+│   ├── executive_overview.png
+│   └── sales_analysis.png
 ├── sql/
-│   └── 01_business_analysis.sql
+│   ├── 01_create_schema.sql
+│   └── 02_business_analysis.sql
 ├── src/
 │   └── data/
 │       └── load_to_mysql.py
@@ -160,68 +256,18 @@ retail-sales-analytics-forecasting/
 └── requirements.txt
 ```
 
-## Getting Started
-
-### 1. Clone the repository
-
-```bash
-git clone https://github.com/sankya-jadhav/retail-sales-analytics-forecasting.git
-cd retail-sales-analytics-forecasting
-```
-
-### 2. Create a virtual environment
-
-```bash
-python -m venv .venv
-```
-
-Activate it on Windows:
-
-```powershell
-.\.venv\Scripts\Activate.ps1
-```
-
-### 3. Install dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure MySQL
-
-Create the MySQL database and prepare the required tables before running the ETL script.
-
-Copy `.env.example` to `.env` and enter your local database configuration:
-
-```env
-DB_HOST=localhost
-DB_USER=your_mysql_username
-DB_PASSWORD=your_mysql_password
-DB_NAME=retail_sales_analytics
-```
-
-Keep `.env` private. Never commit actual credentials to GitHub.
-
-### 5. Run the analysis
-
-Open `notebook/sales.ipynb` in Jupyter Notebook or VS Code to explore the analysis and forecasting workflow.
-
-Execute `sql/01_business_analysis.sql` in MySQL after the database and required tables have been created and populated.
-
-The ETL script is located at `src/data/load_to_mysql.py`. Ensure the database schema and required dimension tables are ready before executing it.
-
 ## Future Improvements
 
-- Add automated data quality checks and ETL logging.
-- Improve forecasting with additional historical data and further validation.
-- Investigate prediction intervals and forecast uncertainty.
-- document the database setup in greater detail.
-- Extend the pipeline to support refreshed sales data.
+-   Add automated data-quality checks and structured ETL logging.
+-   Make the database load fully repeatable, including dimension
+    population and safe reruns.
+-   Evaluate forecasting with longer, more representative, and more
+    recent data.
+-   Explore prediction intervals and additional seasonal baselines.
+-   Document tested package versions and Power BI connection
+    configuration.
 
 ## Author
 
-**Sanket Jadhav**
-
+**Sanket Jadhav**\
 GitHub: [sankya-jadhav](https://github.com/sankya-jadhav)
-
-This project demonstrates practical skills in data analysis, SQL, ETL development, business intelligence, and time-series forecasting.

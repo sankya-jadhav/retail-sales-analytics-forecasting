@@ -1,1 +1,0 @@
-##this file is used to perform business analysis on the sales data. It contains SQL queries that can be executed against the sales database to extract insights and generate reports.
