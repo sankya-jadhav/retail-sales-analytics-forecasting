@@ -128,7 +128,14 @@ The Power BI report organizes the analysis into three pages:
 
 The dashboard uses the MySQL tables as its data source and includes interactive filtering for relevant sales dimensions.
 
-*Add dashboard screenshots here to make the report easier to explore on GitHub.*
+### Executive Overview
+![Executive Overview](screenshots/executive_overview.png)
+
+### Sales Analysis
+![Sales Analysis](screenshots/sales_analysis.png)
+
+### Demand Forecasting
+![Demand Forecasting](screenshots/demand_forecasting.png)
 
 ## Project Structure
 
