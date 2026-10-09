@@ -215,7 +215,7 @@ The ETL script is located at `src/data/load_to_mysql.py`. Ensure the database sc
 - Add automated data quality checks and ETL logging.
 - Improve forecasting with additional historical data and further validation.
 - Investigate prediction intervals and forecast uncertainty.
-- Add dashboard screenshots and document the database setup in greater detail.
+- document the database setup in greater detail.
 - Extend the pipeline to support refreshed sales data.
 
 ## Author
